@@ -1,0 +1,106 @@
+#!/usr/bin/python
+import sys
+import os
+from Crypto.Cipher import AES
+import multiprocessing
+# import time
+
+def ECBencrypt(key, raw):
+    cipher = AES.AESCipher(key[:32], AES.MODE_ECB)
+    ciphertext = cipher.encrypt(raw)
+    return ciphertext
+
+# input two string, return the bitwise XOR of two strings
+def StrXOR(S1, S2):
+    zipped = zip(S1, S2)
+    XORSTR = ""
+    for s1, s2 in zipped:
+        XORSTR += chr(ord(s1) ^ ord(s2))
+    return XORSTR
+
+def randomIVgenerator():
+    return os.urandom(16)
+
+# input the plaintext file, return a list of plaintext block
+def CTRinputregulation(inputfile):
+    plaintextblocklist = []
+    input = open(inputfile, "rb")
+    block = input.read(16)
+    while (block):
+        plaintextblocklist.append(block)
+        block = input.read(16)
+    return plaintextblocklist
+
+def Counterincrease(counter):
+    hexcounter = counter.encode("hex")
+    intcounter = int(hexcounter, 16)
+    newcounter = (intcounter + 1) % int("ffffffffffffffffffffffffffffffff", 16)
+    hexnewcounter = hex(newcounter)[2:-1]
+    if len(hexnewcounter) < 32:
+        for _ in xrange(32 - len(hexnewcounter)):
+            hexnewcounter = "0"+hexnewcounter
+    return hexnewcounter.decode("hex")
+
+def CTRencryptparallel(inputblock):
+    key = KEY
+    CTR = inputblock[1]
+    CTRoutput = ECBencrypt(key, CTR)
+    if len(inputblock[0]) == 16:
+        return StrXOR(inputblock[0], CTRoutput)
+    else:
+        messagelenght = len(inputblock[0])
+        return StrXOR(inputblock[1], CTRoutput[:messagelenght])
+    # return ciphertext
+
+def parallelinputregulation(plaintextblocklist, IV):
+    paralleinput = []
+    CTR = Counterincrease(IV)
+    for block in plaintextblocklist:
+        paralleinput.append((block, CTR))
+        CTR = Counterincrease(CTR)
+    return paralleinput
+
+
+def paralleloutputregulation(IV, cipherblocklist):
+    cipher = IV
+    for block in cipherblocklist:
+        cipher += block
+    return cipher
+
+if __name__ == "__main__":
+    #print sys.argv
+    # initialtime = time.time()
+    if "-i" not in sys.argv:
+        print "No INPUT FILE"
+    if "-o" not in sys.argv:
+        print "NO OUTPUT FILE"
+    if "-k" not in sys.argv:
+        print "NO KEY FILE"
+    keyfile = sys.argv[ sys.argv.index("-k") + 1]
+    inputfile = sys.argv[ sys.argv.index("-i") + 1]
+    outputfile  = sys.argv[ sys.argv.index("-o") + 1]
+    if "-v" in sys.argv:
+        IV = open(sys.argv[ sys.argv.index("-v") + 1]).read()
+        if len(IV) > 16:
+            IV = IV[:16]
+            print "IV was more than 128 bytes, only the first 128 bits were used"
+        InitializeVector = IV
+    else:
+        InitializeVector = randomIVgenerator()
+        print "NO IV file, random IV generated."
+        print "IV in hex string: ", InitializeVector.encode("hex")
+
+    KEY = open(keyfile).read()
+    if len(KEY) > 32:
+        KEY = KEY[:32]
+        print "the key was more than 256 bits, only the first 256 bits were used"
+
+    regulatedinput = parallelinputregulation(CTRinputregulation(inputfile), InitializeVector)
+    procpools = multiprocessing.Pool(multiprocessing.cpu_count())
+    cipherblocklist = procpools.map(CTRencryptparallel, regulatedinput)
+
+    Cipher = paralleloutputregulation(InitializeVector, cipherblocklist)
+    Cipherfile = open(outputfile, "wb+")
+    Cipherfile.write(Cipher)
+    Cipherfile.close()
+    # print time.time()-initialtime

@@ -1,0 +1,87 @@
+#!/usr/bin/python
+import sys
+from Crypto.Cipher import AES
+import multiprocessing
+# import time
+
+def ECBencrypt(key, raw):
+    cipher = AES.AESCipher(key[:32], AES.MODE_ECB)
+    ciphertext = cipher.encrypt(raw)
+    return ciphertext
+
+# input two string, return the bitwise XOR of two strings
+def StrXOR(S1, S2):
+    zipped = zip(S1, S2)
+    XORSTR = ""
+    for s1, s2 in zipped:
+        XORSTR += chr(ord(s1) ^ ord(s2))
+    return XORSTR
+
+def Counterincrease(counter):
+    hexcounter = counter.encode("hex")
+    intcounter = int(hexcounter, 16)
+    newcounter = (intcounter + 1) % int("ffffffffffffffffffffffffffffffff", 16)
+    hexnewcounter = hex(newcounter)[2:-1]
+    if len(hexnewcounter) < 32:
+        for _ in xrange(32 - len(hexnewcounter)):
+            hexnewcounter = "0"+hexnewcounter
+    return hexnewcounter.decode("hex")
+
+#input a pair of (CTR, cipherblock), return the corresponding plaintext block
+def CTRdecryption(cipherblockpair):
+    CTR = cipherblockpair[0]
+    CTRoutput = ECBencrypt(KEY, CTR)
+    if len(cipherblockpair[1]) < 16:
+        return StrXOR(CTRoutput[:len(cipherblockpair[1])], cipherblockpair[1])
+    else:
+        return StrXOR(cipherblockpair[1], CTRoutput)
+
+
+# input the cipher in binary text, and return the IV, and a list of cipher block
+def CTRinputregulation(ciphertext):
+    cipherblocklist = []
+    IV = ciphertext[:16]
+    CTR = IV
+    flag = 16
+    while flag < len(ciphertext):
+        CTR = Counterincrease(CTR)
+        if flag + 16 > len(ciphertext):
+            cipherblocklist.append( (CTR, ciphertext[flag : ]) )
+        cipherblocklist.append( (CTR, ciphertext[flag:flag + 16]) )
+        flag += 16
+    return cipherblocklist
+
+def CTRoutputregulation(plaintextblocklist):
+    plaintext = ""
+    for block in plaintextblocklist:
+        plaintext += block
+    return plaintext
+
+if __name__ == "__main__":
+    #print sys.argv
+    # initialtime = time.time()
+    
+    if "-i" not in sys.argv:
+        print "No INPUT FILE"
+    if "-o" not in sys.argv:
+        print "NO OUTPUT FILE"
+    if "-k" not in sys.argv:
+        print "NO KEY FILE"
+
+    keyfile = sys.argv[ sys.argv.index("-k") + 1]
+    inputfile = sys.argv[ sys.argv.index("-i") + 1]
+    outputfile  = sys.argv[ sys.argv.index("-o") + 1]
+
+    KEY = open(keyfile).read()
+    if len(KEY) > 32:
+        KEY = KEY[:32]
+        print "the key was more than 256 bits, only the first 256 bits were used"
+    cipherblockpair = CTRinputregulation(open(inputfile).read())
+    procpools = multiprocessing.Pool(multiprocessing.cpu_count())
+    plaintextlist = procpools.map(CTRdecryption, cipherblockpair)
+    plaintext = CTRoutputregulation(plaintextlist)
+
+    plaintextfile = open(outputfile, "wb+")
+    plaintextfile.write(plaintext)
+    plaintextfile.close()
+    # print time.time() - initialtime

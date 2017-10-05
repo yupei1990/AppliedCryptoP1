@@ -1,0 +1,22 @@
+This file folder contains five executable python files, an input file and a key file.
+
+Each executable encryption/decryption file can be used to encrypt or decrypt an input file in CBC or CTR mode in block cipher, as its name shown. The binary-hex executable file was used to show a binary file in hex string or convert a hex string to the corresponding binary file. The input file can be any file you want, the image file misaka.jpg is just for demonstration. The key file was used to store the key for encryption and decryption. A random string was generated as the key for demonstration, and the users can set the key by themselves.
+
+Before using the executable file to encrypt or decrypt data, the directory of the folder should be added to the PATH variable of the operating system.
+
+To encrypt or decrypt the data, just type <executable file> flag <file> into the terminal. For example, to encrypt the file misaka.jgp with key stored in file KEY in cbc mode with initialize vector stored in IV, just type
+
+cbc-enc -i misaka.jpg -o <outputfile> -k KEY -v IV
+
+into terminal. The flag -v and IV file is optional. If no IV file was included in command, the program will randomly generate an IV for encryption.
+
+The output file of encryption should be binary file. If you want to show the binary file in hex string, the program binary-hex should be used. For example, we has binary file outputfile, type 
+
+binary-hex -h outputfile
+
+into terminal, a hex string file outputfile-hexstring will be generated. Vice versa, if you want to convert a hex string file to its corresponding binary file, type
+
+binary-hex -b outputfile-hexstring 
+
+into terminal, a binary file outputfile-hexstring-binary will be generated. 
+
