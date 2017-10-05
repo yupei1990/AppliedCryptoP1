@@ -49,7 +49,7 @@ def CTRencryptparallel(inputblock):
         return StrXOR(inputblock[0], CTRoutput)
     else:
         messagelenght = len(inputblock[0])
-        return StrXOR(inputblock[1], CTRoutput[:messagelenght])
+        return StrXOR(inputblock[0], CTRoutput[:messagelenght])
     # return ciphertext
 
 def parallelinputregulation(plaintextblocklist, IV):

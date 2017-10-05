@@ -47,6 +47,7 @@ def CTRinputregulation(ciphertext):
         CTR = Counterincrease(CTR)
         if flag + 16 > len(ciphertext):
             cipherblocklist.append( (CTR, ciphertext[flag : ]) )
+            break
         cipherblocklist.append( (CTR, ciphertext[flag:flag + 16]) )
         flag += 16
     return cipherblocklist
