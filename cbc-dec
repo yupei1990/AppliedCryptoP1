@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 import sys
 import binascii
 from Crypto.Cipher import AES
@@ -64,6 +64,6 @@ if __name__ == "__main__":
     outputfile  = sys.argv[ sys.argv.index("-o") + 1]
 
     plaintext = CBCoutputregulation(CBCdecryption(open(keyfile).read(), open(inputfile).read()))
-    plaintextfile = open(outputfile, "ab+")
+    plaintextfile = open(outputfile, "wb+")
     plaintextfile.write(plaintext)
     plaintextfile.close()
