@@ -73,7 +73,7 @@ if __name__ == "__main__":
     inputfile = sys.argv[ sys.argv.index("-i") + 1]
     outputfile  = sys.argv[ sys.argv.index("-o") + 1]
 
-    KEY = open(keyfile).read()
+    KEY = open(keyfile).read().decode("hex")
     if len(KEY) > 32:
         KEY = KEY[:32]
         print "the key was more than 256 bits, only the first 256 bits were used"

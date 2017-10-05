@@ -1,0 +1,87 @@
+./ctr-enc -i testFile1 -o cipher -k keyFile1
+./ctr-dec -i cipher -o recover -k keyFile1
+diff recover testFile1
+
+rm recover
+rm cipher
+
+./ctr-enc -i testFile1 -o cipher -k keyFile2
+./ctr-dec -i cipher -o recover -k keyFile2
+diff recover testFile1
+
+
+rm recover
+rm cipher
+
+./ctr-enc -i testFile2 -o cipher -k keyFile1
+./ctr-dec -i cipher -o recover -k keyFile1
+diff recover testFile2
+
+
+rm recover
+rm cipher
+
+./ctr-enc -i testFile2 -o cipher -k keyFile2
+./ctr-dec -i cipher -o recover -k keyFile2
+diff recover testFile2
+
+rm recover
+rm cipher
+
+./ctr-enc -i testFile3 -o cipher -k keyFile1
+./ctr-dec -i cipher -o recover -k keyFile1
+diff recover testFile3
+
+rm recover
+rm cipher
+
+./ctr-enc -i testFile3 -o cipher -k keyFile2
+./ctr-dec -i cipher -o recover -k keyFile2
+diff recover testFile3
+
+rm recover
+rm cipher
+
+
+./cbc-enc -i testFile1 -o cipher -k keyFile1
+./cbc-dec -i cipher -o recover -k keyFile1
+diff recover testFile1
+
+rm recover
+rm cipher
+
+
+./cbc-enc -i testFile1 -o cipher -k keyFile2
+./cbc-dec -i cipher -o recover -k keyFile2
+diff recover testFile1
+
+rm recover
+rm cipher
+
+./cbc-enc -i testFile2 -o cipher -k keyFile1
+./cbc-dec -i cipher -o recover -k keyFile1
+diff recover testFile2
+
+rm recover
+rm cipher
+
+./cbc-enc -i testFile2 -o cipher -k keyFile2
+./cbc-dec -i cipher -o recover -k keyFile2
+diff recover testFile2
+
+rm recover
+rm cipher
+
+./cbc-enc -i testFile3 -o cipher -k keyFile1
+./cbc-dec -i cipher -o recover -k keyFile1
+diff recover testFile3
+
+rm recover
+rm cipher
+
+./cbc-enc -i testFile3 -o cipher -k keyFile2
+./cbc-dec -i cipher -o recover -k keyFile2
+diff recover testFile3
+
+rm recover
+rm cipher

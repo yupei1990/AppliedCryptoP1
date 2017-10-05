@@ -41,7 +41,7 @@ def CBCoutputregulation(listofplaintextblock):
     if listofplaintextblock[-1] == "10101010101010101010101010101010".decode("hex"):
         for block in listofplaintextblock[:-1]:
             plaintext += block
-            return plaintext
+        return plaintext
     else:
         numberofpadding = int(listofplaintextblock[-1][-1].encode("hex"), 16)
         lastblock = listofplaintextblock[-1][:16-numberofpadding]
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     inputfile = sys.argv[ sys.argv.index("-i") + 1]
     outputfile  = sys.argv[ sys.argv.index("-o") + 1]
 
-    plaintext = CBCoutputregulation(CBCdecryption(open(keyfile).read(), open(inputfile).read()))
+    plaintext = CBCoutputregulation(CBCdecryption(open(keyfile).read().decode("hex"), open(inputfile).read()))
     plaintextfile = open(outputfile, "wb+")
     plaintextfile.write(plaintext)
     plaintextfile.close()
